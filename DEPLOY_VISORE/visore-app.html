@@ -1658,8 +1658,8 @@ function toggleApiKey(){
 
 function salvarApiKey(){
   const val = document.getElementById('api-key-input').value.trim();
-  if(!val.startsWith('sk-ant-')){
-    toast('⚠️ API key inválida. Deve começar com sk-ant-');
+  if(!val.startsWith('AIzaSy')){
+    toast('⚠️ API key do Google inválida. (Começa com AIzaSy)');
     return;
   }
   _apiKey = val;
@@ -1672,108 +1672,19 @@ function salvarApiKey(){
 
 async function apiCall(prompt, maxTokens=800){
   // Se tiver chave local, chama direto; senão usa o proxy seguro da Netlify Function
-  if(_apiKey){
-    const headers = {'Content-Type':'application/json','anthropic-version':'2023-06-01','x-api-key':_apiKey};
-    const resp = await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST', headers,
-      body: JSON.stringify({model:'claude-3-5-sonnet-20241022',max_tokens:maxTokens,messages:[{role:'user',content:prompt}]})
+    if(_apiKey){
+    const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + _apiKey;
+    const resp = await fetch(url, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
     });
-    if(!resp.ok){
-      const err = await resp.json().catch(()=>({}));
-      throw new Error(err.error?.message||resp.statusText);
-    }
     const d = await resp.json();
-    return d.content?.map(x=>x.text||'').join('') || '';
+    if(!resp.ok){
+      throw new Error(d.error?.message||resp.statusText);
+    }
+    return d.candidates?.[0]?.content?.parts?.[0]?.text || '';
   }
-  // Proxy seguro — chave fica no servidor Netlify
-  const resp = await fetch('/.netlify/functions/claude',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({prompt, maxTokens})
-  });
-  if(!resp.ok){
-    let msg = `HTTP ${resp.status}`;
-    try{ const e=await resp.json(); msg=e.error?.message||msg; }catch(e){}
-    if(resp.status===401) msg = 'API Key inválida ou ausente. Clique em 🔑 API Key para configurar.';
-    if(resp.status===403) msg = 'Sem permissão. Verifique sua API Key.';
-    throw new Error(msg);
-  }
-  const data = await resp.json();
-  const text = data.text || data.content?.find(b=>b.type==='text')?.text || '';
-  if(!text) throw new Error('Resposta vazia da IA. Tente novamente.');
-  return text;
-}
-
-// ═══════════════════════════════════════════
-// PERÍODO / FILTRO DE DATA
-// ═══════════════════════════════════════════
-let periodoAtual = 'tudo';
-
-function setMesAtual(){
-  const agora = new Date();
-  const anoEl = document.getElementById('period-ano-sel');
-  const mesEl = document.getElementById('period-mes-sel');
-  if(anoEl) anoEl.value = agora.getFullYear();
-  if(mesEl) mesEl.value = agora.getMonth()+1;
-  const btn = document.getElementById('btn-mes-atual');
-  btn.classList.add('on');
-  setTimeout(()=>btn.classList.remove('on'), 1500);
-  renderAll();
-  autoPopularSimulador();
-}
-
-function dadosFiltrados(){
-  const anoVal = document.getElementById('period-ano-sel')?.value || 'todos';
-  const mesVal = document.getElementById('period-mes-sel')?.value || 'todos';
-  if(anoVal === 'todos' && mesVal === 'todos') return dados;
-  return dados.filter(l=>{
-    // Usar dataComp para filtro de período (regime de competência por padrão)
-    const dataRef = l.dataComp || l.data;
-    if(!dataRef) return false;
-    const d = new Date(dataRef+'T12:00:00');
-    const anoOk = anoVal === 'todos' || d.getFullYear() === parseInt(anoVal);
-    const mesOk = mesVal === 'todos' || (d.getMonth()+1) === parseInt(mesVal);
-    return anoOk && mesOk;
-  });
-}
-
-function labelPeriodo(){
-  const df = dadosFiltrados();
-  const anoVal = document.getElementById('period-ano-sel')?.value || 'todos';
-  const mesVal = document.getElementById('period-mes-sel')?.value || 'todos';
-  const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  if(anoVal === 'todos' && mesVal === 'todos') return `Todos os períodos (${dados.length} lançamentos)`;
-  if(anoVal !== 'todos' && mesVal === 'todos') return `Ano ${anoVal} — ${df.length} lançamento${df.length!==1?'s':''}`;
-  if(anoVal !== 'todos' && mesVal !== 'todos') return `${meses[parseInt(mesVal)-1]}/${anoVal} — ${df.length} lançamento${df.length!==1?'s':''}`;
-  return `${meses[parseInt(mesVal)-1]} (todos os anos) — ${df.length} lançamentos`;
-}
-
-// ─── ESTADO GLOBAL
-let dados = [];
-let tipoForm = 'e';
-let arquivoAtual = null;
-let prevData = [];
-let segAtual = null;
-let todosAbertos = false;
-
-const HIST = [
-  {m:'Jan',r:0,d:0},{m:'Fev',r:0,d:0},{m:'Mar',r:0,d:0},
-  {m:'Abr',r:0,d:0},{m:'Mai',r:0,d:0},{m:'Jun',r:0,d:0},
-];
-
-
-const CAT_CORES = {
-  'Vendas de Produtos':'#0e7a45','Prestação de Serviços':'#1a7a6a','Outras Receitas':'#4a7a1a',
-  'CMV — Custo das Mercadorias':'#7b3ab0','CPV — Custo dos Serviços':'#6a3ab0',
-  'Matéria-Prima / Insumos':'#7a4ab0','Mão de Obra Direta':'#8a3ab0',
-  'Folha de Pagamento':'#c0282a','Pró-labore':'#b03060','Aluguel / Ocupação':'#c06020',
-  'Energia / Água / Telecom':'#1a60c0','Combustível / Frota':'#d48020',
-  'Marketing e Vendas':'#e040a0','Manutenção e Reparos':'#808040',
-  'Sistemas e TI':'#4060a0','Despesas Administrativas':'#607080',
-  'Juros e IOF':'#b03060','Tarifas Bancárias':'#908060','Parcelas de Empréstimo':'#904040',
-  'DAS / Simples Nacional':'#506080','IRPJ / CSLL':'#405070',
-  'FGTS':'#6080a0','INSS Patronal':'#7090b0','Outros Impostos':'#8090a0',
-};
 
 const FINS = ['Juros e IOF','Tarifas Bancárias','Parcelas de Empréstimo'];
 const IMPS = ['DAS / Simples Nacional','IRPJ / CSLL','FGTS','INSS Patronal','Outros Impostos'];
