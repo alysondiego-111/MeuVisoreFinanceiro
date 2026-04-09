@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visore — Gestão Financeira Inteligente para Empresas</title>
+<meta name="description" content="Visore transforma os números da sua empresa em decisões claras. DRE, EBITDA, fluxo de caixa, análise histórica e relatório executivo com IA.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+    /* â”€â”€ DARK NEON THEME â”€â”€ */
+  --navy:   #0F172A; /* Deep dark blue */
+  --navy2:  rgba(15, 23, 42, 0.95);
+  --gold:   #06b6d4; /* Neon Teal */
+  --gold2:  #22d3ee;
+  --cream:  rgba(30, 41, 59, 0.65); /* Glass surface */
+  --white:  #F8FAFC;
+  --tx:     #F8FAFC;
+  --tx2:    #CBD5E1;
+  --tx3:    #94A3B8;
+  --grn:    #10B981;
+  --gl-blur: blur(12px);
+  --gl-brd: 1px solid rgba(255, 255, 255, 0.05);
+  --sh-lg: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--navy2);
+  color: var(--white);
+  overflow-x: hidden;
+}
+
+/* ── NOISE TEXTURE ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: .4;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 48px;
+  background: rgba(15, 23, 42, 0.7); backdrop-filter: var(--gl-blur);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(212,175,55,.12);
+}
+
+.nav-logo {
+  font-family: 'Outfit', serif;
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.nav-logo .logo-badge {
+  width: 34px;
+  height: 34px;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--navy2);
+  font-family: 'Outfit', serif;
+}
+
+.nav-logo em { color: var(--gold); font-style: normal; }
+
+.nav-cta {
+  background: var(--gold);
+  color: var(--navy2);
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all .2s;
+}
+.nav-cta:hover { background: var(--gold2); transform: translateY(-1px); }
+
+/* ── HERO ── */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 120px 48px 80px;
+  overflow: hidden;
+}
+
+/* Fundo geométrico */
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.hero-bg::before {
+  content: '';
+  position: absolute;
+  top: -20%; right: -10%;
+  width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(212,175,55,.12) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.hero-bg::after {
+  content: '';
+  position: absolute;
+  bottom: -20%; left: -5%;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(212,175,55,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212,175,55,.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  text-align: center;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(212,175,55,.1);
+  border: 1px solid rgba(212,175,55,.25);
+  border-radius: 100px;
+  padding: 6px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  margin-bottom: 32px;
+  animation: fadeUp .8s ease both;
+}
+
+.hero-title {
+  font-family: 'Outfit', serif;
+  font-size: clamp(42px, 7vw, 80px);
+  font-weight: 900;
+  line-height: 1.05;
+  margin-bottom: 24px;
+  animation: fadeUp .8s .1s ease both;
+}
+
+.hero-title em {
+  color: var(--gold);
+  font-style: italic;
+}
+
+.hero-title .line2 {
+  display: block;
+  color: rgba(255,255,255,.55);
+  font-weight: 400;
+  font-style: italic;
+  font-size: clamp(32px, 5vw, 58px);
+}
+
+.hero-sub {
+  font-size: clamp(15px, 2vw, 19px);
+  color: rgba(255,255,255,.6);
+  line-height: 1.7;
+  max-width: 580px;
+  margin: 0 auto 40px;
+  animation: fadeUp .8s .2s ease both;
+}
+
+.hero-btns {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: fadeUp .8s .3s ease both;
+}
+
+.btn-primary {
+  background: var(--gold);
+  color: var(--navy2);
+  padding: 15px 36px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 15px;
+  text-decoration: none;
+  transition: all .2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-primary:hover { background: var(--gold2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(212,175,55,.3); }
+
+.btn-secondary {
+  background: rgba(255,255,255,.07);
+  color: rgba(255,255,255,.85);
+  padding: 15px 36px;
+  border-radius: 10px;
+  font-weight: 500;
+  font-size: 15px;
+  text-decoration: none;
+  border: 1px solid rgba(255,255,255,.12);
+  transition: all .2s;
+}
+.btn-secondary:hover { background: rgba(255,255,255,.12); }
+
+/* KPIs flutuantes */
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin-top: 64px;
+  flex-wrap: wrap;
+  animation: fadeUp .8s .4s ease both;
+}
+
+.hero-stat {
+  text-align: center;
+}
+.hero-stat .num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--gold);
+  display: block;
+}
+.hero-stat .lbl {
+  font-size: 12px;
+  color: rgba(255,255,255,.4);
+  text-transform: uppercase;
+  letter-spacing: .6px;
+}
+
+/* ── NOME / ORIGEM ── */
+.origem {
+  position: relative;
+  z-index: 1;
+  background: var(--navy2);
+  padding: 100px 48px;
+  overflow: hidden;
+}
+
+.origem::before {
+  content: '"';
+  position: absolute;
+  top: -40px; left: 40px;
+  font-family: 'Outfit', serif;
+  font-size: 300px;
+  color: rgba(212,175,55,.05);
+  font-weight: 900;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.origem-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.origem-left .sec-tag {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--gold);
+  margin-bottom: 16px;
+  display: block;
+}
+
+.origem-left h2 {
+  font-family: 'Outfit', serif;
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 900;
+  line-height: 1.15;
+  margin-bottom: 24px;
+}
+
+.origem-left h2 em {
+  color: var(--gold);
+  font-style: italic;
+}
+
+.origem-left p {
+  font-size: 16px;
+  color: rgba(255,255,255,.65);
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+
+.origem-right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.etimo-card {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(212,175,55,.15);
+  border-radius: 16px;
+  padding: 28px 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+.etimo-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+  background: var(--gold);
+  border-radius: 3px 0 0 3px;
+}
+
+.etimo-lang {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+
+.etimo-word {
+  font-family: 'Outfit', serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 6px;
+}
+
+.etimo-def {
+  font-size: 14px;
+  color: rgba(255,255,255,.55);
+  line-height: 1.6;
+}
+
+/* ── APP PREVIEW ── */
+.preview {
+  position: relative;
+  z-index: 1;
+  background: var(--navy2);
+  padding: 100px 48px;
+}
+
+.preview-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.sec-header {
+  text-align: center;
+  margin-bottom: 64px;
+}
+
+.sec-tag {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--gold);
+  margin-bottom: 16px;
+  display: block;
+}
+
+.sec-title {
+  font-family: 'Outfit', serif;
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 900;
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+
+.sec-sub {
+  font-size: 16px;
+  color: rgba(255,255,255,.55);
+  max-width: 520px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* Mockup do app */
+.app-mockup {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 40px 80px rgba(0,0,0,.5);
+}
+
+.app-topbar {
+  background: rgba(0,40,85,.9);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid rgba(212,175,55,.12);
+}
+
+.app-tb-logo {
+  width: 28px; height: 28px;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Outfit', serif;
+  font-weight: 900;
+  font-size: 13px;
+  color: var(--navy2);
+}
+
+.app-tb-name {
+  font-family: 'Outfit', serif;
+  font-weight: 900;
+  font-size: 16px;
+  color: var(--white);
+}
+.app-tb-name em { color: var(--gold); font-style: normal; }
+
+.app-body {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  min-height: 340px;
+}
+
+.app-sidebar {
+  background: rgba(15, 23, 42, 0.7); backdrop-filter: var(--gl-blur);
+  padding: 16px 0;
+  border-right: 1px solid rgba(255,255,255,.06);
+}
+
+.app-sb-section {
+  padding: 6px 14px;
+  margin-bottom: 4px;
+}
+
+.app-sb-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(212,175,55,.5);
+  padding: 4px 10px;
+  margin-bottom: 2px;
+}
+
+.app-sb-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 7px;
+  font-size: 11px;
+  color: rgba(255,255,255,.5);
+  margin-bottom: 2px;
+}
+
+.app-sb-item.on {
+  background: rgba(212,175,55,.15);
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.app-content {
+  padding: 20px;
+  background: transparent;
+}
+
+.app-kpis {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.app-kpi {
+  background: rgba(255,255,255,0.03); border: var(--gl-brd);
+  border-radius: 8px;
+  padding: 10px;
+  border-top: 2px solid rgba(255,255,255,0.1);
+}
+
+.app-kpi.g { border-top-color: var(--white); }
+.app-kpi.r { border-top-color: var(--white); }
+.app-kpi.b { border-top-color: var(--white); }
+.app-kpi.o { border-top-color: #D4AF37; }
+
+.app-kpi-lbl {
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: var(--tx3);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.app-kpi-val {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--white);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.app-kpi-val.g { color: var(--white); }
+.app-kpi-val.r { color: var(--white); }
+
+.app-charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.app-chart-card {
+  background: rgba(255,255,255,0.03); border: var(--gl-brd);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.app-chart-title {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--tx3);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.mini-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 50px;
+}
+
+.mini-bar {
+  flex: 1;
+  border-radius: 3px 3px 0 0;
+  min-width: 10px;
+}
+
+/* ── FEATURES ── */
+.features {
+  position: relative;
+  z-index: 1;
+  background: var(--navy2);
+  padding: 100px 48px;
+}
+
+.features-grid {
+  max-width: 1100px;
+  margin: 64px auto 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.feat-card {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 16px;
+  padding: 32px 28px;
+  transition: all .3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.feat-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0;
+  transition: opacity .3s;
+}
+
+.feat-card:hover {
+  background: rgba(212,175,55,.05);
+  border-color: rgba(212,175,55,.2);
+  transform: translateY(-4px);
+}
+.feat-card:hover::after { opacity: 1; }
+
+.feat-icon {
+  font-size: 28px;
+  margin-bottom: 16px;
+}
+
+.feat-title {
+  font-family: 'Outfit', serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--white);
+}
+
+.feat-desc {
+  font-size: 14px;
+  color: rgba(255,255,255,.5);
+  line-height: 1.7;
+}
+
+/* ── CONSULTOR ── */
+.consultor {
+  position: relative;
+  z-index: 1;
+  background: var(--navy2);
+  padding: 100px 48px;
+}
+
+.consultor-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.consultor-quote {
+  font-family: 'Outfit', serif;
+  font-size: clamp(20px, 3vw, 32px);
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.5;
+  color: rgba(255,255,255,.8);
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.consultor-quote::before {
+  content: '"';
+  font-size: 80px;
+  color: rgba(212,175,55,.2);
+  position: absolute;
+  top: -20px; left: -20px;
+  font-family: 'Outfit', serif;
+  line-height: 1;
+}
+
+.consultor-steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 60px;
+  text-align: left;
+}
+
+.step-card {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 14px;
+  padding: 24px 20px;
+}
+
+.step-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 28px;
+  font-weight: 700;
+  color: rgba(212,175,55,.3);
+  display: block;
+  margin-bottom: 10px;
+}
+
+.step-title {
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: var(--white);
+}
+
+.step-desc {
+  font-size: 12px;
+  color: rgba(255,255,255,.45);
+  line-height: 1.6;
+}
+
+/* ── CTA FINAL ── */
+.cta-final {
+  position: relative;
+  z-index: 1;
+  background: var(--navy2);
+  padding: 100px 48px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.cta-final::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(212,175,55,.08) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.cta-final h2 {
+  font-family: 'Outfit', serif;
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 900;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.cta-final h2 em { color: var(--gold); font-style: italic; }
+
+.cta-final p {
+  font-size: 16px;
+  color: rgba(255,255,255,.55);
+  margin-bottom: 40px;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+}
+
+/* ── FOOTER ── */
+footer {
+  background: var(--navy2);
+  border-top: 1px solid rgba(212,175,55,.1);
+  padding: 32px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.footer-logo {
+  font-family: 'Outfit', serif;
+  font-weight: 900;
+  font-size: 18px;
+  color: var(--white);
+}
+.footer-logo em { color: var(--gold); font-style: normal; }
+
+footer p {
+  font-size: 12px;
+  color: rgba(255,255,255,.35);
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity .7s ease, transform .7s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  nav { padding: 16px 24px; }
+  .hero { padding: 100px 24px 60px; }
+  .origem-inner { grid-template-columns: 1fr; gap: 40px; }
+  .features-grid { grid-template-columns: 1fr 1fr; }
+  .consultor-steps { grid-template-columns: 1fr 1fr; }
+  .app-body { grid-template-columns: 1fr; }
+  .app-sidebar { display: none; }
+  .app-kpis { grid-template-columns: 1fr 1fr 1fr; }
+  footer { flex-direction: column; text-align: center; }
+}
+
+@media (max-width: 600px) {
+  nav { padding: 14px 18px; }
+  .hero { padding: 90px 20px 50px; }
+  .origem, .preview, .features, .consultor, .cta-final { padding: 70px 20px; }
+  .features-grid { grid-template-columns: 1fr; }
+  .consultor-steps { grid-template-columns: 1fr; }
+  .app-kpis { grid-template-columns: 1fr 1fr; }
+  .app-charts { grid-template-columns: 1fr; }
+  .hero-stats { gap: 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="logo-badge">V</div>
+    Vi<em>sore</em>
+  </a>
+  <a class="nav-cta" href="./index.html" target="_blank">Acessar o App →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="hero-grid"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-badge">✦ Gestão Financeira com Inteligência Artificial</div>
+    <h1 class="hero-title">
+      Enxergue seus números<br>
+      <em>com clareza total</em>
+      <span class="line2">e decida com segurança</span>
+    </h1>
+    <p class="hero-sub">
+      Visore é a plataforma de gestão financeira para PMEs brasileiras — DRE gerencial, EBITDA, análise histórica e relatório executivo com IA em uma única tela.
+    </p>
+    <div class="hero-btns">
+      <a href="./index.html" target="_blank" class="btn-primary">
+        ▶ Abrir o Visore
+      </a>
+      <a href="#features" class="btn-secondary">Ver funcionalidades</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="num">DRE</span>
+        <span class="lbl">Gerencial completo</span>
+      </div>
+      <div class="hero-stat" style="border-left:1px solid rgba(255,255,255,.08);border-right:1px solid rgba(255,255,255,.08);padding:0 32px">
+        <span class="num">EBITDA</span>
+        <span class="lbl">Em todos os módulos</span>
+      </div>
+      <div class="hero-stat">
+        <span class="num">IA</span>
+        <span class="lbl">Importação + análise</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ORIGEM DO NOME -->
+<section class="origem" id="origem">
+  <div class="origem-inner">
+    <div class="origem-left reveal">
+      <span class="sec-tag">A origem do nome</span>
+      <h2>Quem <em>enxerga</em><br>os números,<br>governa o negócio</h2>
+      <p>
+        Visore vem do italiano <strong style="color:var(--gold)">visore</strong> — aquele que vê, o instrumento de visão. Na gestão financeira, a clareza sobre os próprios números é a diferença entre um negócio que reage e um que antecipa.
+      </p>
+      <p>
+        O nome carrega uma filosofia: não basta ter dados — é preciso <em style="color:rgba(255,255,255,.8)">enxergar o que eles significam</em>. Por isso o Visore foi construído para traduzir faturamento, custos e margens em decisões práticas, em linguagem que o empresário entende.
+      </p>
+      <p>
+        Do banco de dados para a reunião com o cliente — em minutos, não em dias.
+      </p>
+    </div>
+    <div class="origem-right reveal">
+      <div class="etimo-card">
+        <div class="etimo-lang">Italiano · Substantivo</div>
+        <div class="etimo-word">visore</div>
+        <div class="etimo-def">
+          <em>/viˈzore/</em> — visor, instrumento ótico que amplia e clarifica o que está diante dos olhos. Aquele que é capaz de enxergar além do superficial.
+        </div>
+      </div>
+      <div class="etimo-card" style="background:rgba(212,175,55,.06);border-color:rgba(212,175,55,.25)">
+        <div class="etimo-lang">No contexto empresarial</div>
+        <div class="etimo-word" style="font-size:26px;color:var(--gold)">Visão Estratégica</div>
+        <div class="etimo-def">
+          Transformar dados financeiros brutos em clareza estratégica para tomada de decisão. Ver o que a concorrência não vê. Agir antes que o problema apareça no caixa.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- APP PREVIEW -->
+<section class="preview" id="app">
+  <div class="preview-inner">
+    <div class="sec-header reveal">
+      <span class="sec-tag">O App</span>
+      <h2 class="sec-title">Tudo que a empresa precisa<br>em uma única tela</h2>
+      <p class="sec-sub">Do lançamento do extrato ao relatório executivo para o empresário — sem planilhas, sem complicação.</p>
+    </div>
+
+    <!-- Mockup visual do app -->
+    <div class="app-mockup reveal">
+      <div class="app-topbar">
+        <div class="app-tb-logo">V</div>
+        <div class="app-tb-name">Vi<em>sore</em></div>
+        <span style="margin-left:auto;font-size:11px;color:rgba(255,255,255,.35)">Empresa Demo Ltda &nbsp;·&nbsp; Abril 2026</span>
+      </div>
+      <div class="app-body">
+        <div class="app-sidebar">
+          <div class="app-sb-label">Dia a Dia</div>
+          <div class="app-sb-item on">📊 Dashboard</div>
+          <div class="app-sb-item">✏️ Lançamentos</div>
+          <div class="app-sb-item">📅 Contas a P/R</div>
+          <div class="app-sb-item">🔍 Conciliação</div>
+          <div class="app-sb-item">💰 Fluxo de Caixa</div>
+          <div class="app-sb-item">📑 DRE</div>
+          <div class="app-sb-item">📐 Indicadores</div>
+          <div class="app-sb-label" style="margin-top:12px">Estrutura</div>
+          <div class="app-sb-item">📋 Plano de Contas</div>
+          <div class="app-sb-item">🧮 Simul. Tributário</div>
+          <div class="app-sb-label" style="margin-top:12px">Análise Histórica</div>
+          <div class="app-sb-item">🏦 Balanço & DRE</div>
+          <div class="app-sb-item">📊 Indicadores</div>
+          <div class="app-sb-label" style="margin-top:12px">Relatório</div>
+          <div class="app-sb-item">📄 Rel. Executivo</div>
+        </div>
+        <div class="app-content">
+          <div class="app-kpis">
+            <div class="app-kpi g">
+              <div class="app-kpi-lbl">Receita Total</div>
+              <div class="app-kpi-val g">R$ 76,2k</div>
+            </div>
+            <div class="app-kpi" style="border-top-color:#0e7a45">
+              <div class="app-kpi-lbl">EBITDA</div>
+              <div class="app-kpi-val g">R$ 28,4k</div>
+            </div>
+            <div class="app-kpi r">
+              <div class="app-kpi-lbl">Despesas</div>
+              <div class="app-kpi-val r">R$ 42,1k</div>
+            </div>
+            <div class="app-kpi b">
+              <div class="app-kpi-lbl">Saldo</div>
+              <div class="app-kpi-val" style="color:#002855">R$ 34,1k</div>
+            </div>
+            <div class="app-kpi o">
+              <div class="app-kpi-lbl">Margem Líq.</div>
+              <div class="app-kpi-val" style="color:#D4AF37">37.3%</div>
+            </div>
+          </div>
+          <div class="app-charts">
+            <div class="app-chart-card">
+              <div class="app-chart-title">Receitas × Despesas por Mês</div>
+              <div class="mini-bars">
+                <div class="mini-bar" style="height:35%;background:#0e7a45;opacity:.6"></div>
+                <div class="mini-bar" style="height:55%;background:#c0282a;opacity:.5"></div>
+                <div class="mini-bar" style="height:60%;background:#0e7a45;opacity:.6"></div>
+                <div class="mini-bar" style="height:48%;background:#c0282a;opacity:.5"></div>
+                <div class="mini-bar" style="height:80%;background:#0e7a45;opacity:.7"></div>
+                <div class="mini-bar" style="height:65%;background:#c0282a;opacity:.5"></div>
+                <div class="mini-bar" style="height:100%;background:#0e7a45;opacity:.8"></div>
+                <div class="mini-bar" style="height:72%;background:#c0282a;opacity:.5"></div>
+              </div>
+            </div>
+            <div class="app-chart-card">
+              <div class="app-chart-title">Top Despesas</div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:#555">
+                  <div style="flex:1">Folha de Pagamento</div>
+                  <div style="width:60%;background:#e0e0e0;height:6px;border-radius:3px">
+                    <div style="width:75%;height:100%;background:#002855;border-radius:3px"></div>
+                  </div>
+                  <div style="color:#002855;font-weight:700;font-family:monospace;font-size:10px">R$18,2k</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:#555">
+                  <div style="flex:1">Matéria-Prima</div>
+                  <div style="width:60%;background:#e0e0e0;height:6px;border-radius:3px">
+                    <div style="width:50%;height:100%;background:#D4AF37;border-radius:3px"></div>
+                  </div>
+                  <div style="color:#002855;font-weight:700;font-family:monospace;font-size:10px">R$9,2k</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:#555">
+                  <div style="flex:1">DAS / Simples</div>
+                  <div style="width:60%;background:#e0e0e0;height:6px;border-radius:3px">
+                    <div style="width:30%;height:100%;background:#c0282a;border-radius:3px"></div>
+                  </div>
+                  <div style="color:#002855;font-weight:700;font-family:monospace;font-size:10px">R$3,8k</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div style="max-width:1100px;margin:0 auto">
+    <div class="sec-header reveal">
+      <span class="sec-tag">Funcionalidades</span>
+      <h2 class="sec-title">Construído para o consultor<br>e para o empresário</h2>
+      <p class="sec-sub">Cada módulo foi pensado para gerar valor real — não apenas mostrar números, mas explicar o que fazer com eles.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card reveal">
+        <div class="feat-icon">📑</div>
+        <div class="feat-title">DRE Gerencial</div>
+        <div class="feat-desc">Resultado econômico completo com toggle de Competência × Caixa. EBITDA em destaque. Comparativo automático entre períodos.</div>
+      </div>
+      <div class="feat-card reveal">
+        <div class="feat-icon">🤖</div>
+        <div class="feat-title">Importação com IA</div>
+        <div class="feat-desc">Suba PDF, Excel ou CSV do extrato bancário. A IA lê, classifica e separa competência de caixa automaticamente.</div>
+      </div>
+      <div class="feat-card reveal">
+        <div class="feat-icon">📊</div>
+        <div class="feat-title">Análise Histórica</div>
+        <div class="feat-desc">Balanço Patrimonial e DRE comparativos por ano. Indicadores com tendência. Gráfico de EBITDA e Liquidez Corrente.</div>
+      </div>
+      <div class="feat-card reveal">
+        <div class="feat-icon">📄</div>
+        <div class="feat-title">Relatório Executivo</div>
+        <div class="feat-desc">Três modos: Dia a Dia, Histórico e Comparativo Multi-Ano. Alertas, diagnóstico de tendência e recomendação gerada por IA.</div>
+      </div>
+      <div class="feat-card reveal">
+        <div class="feat-icon">🧮</div>
+        <div class="feat-title">Simulador Tributário</div>
+        <div class="feat-desc">Compare Simples Nacional, Lucro Presumido e Lucro Real com alíquotas reais. Alerta automático de limite do Simples.</div>
+      </div>
+      <div class="feat-card reveal">
+        <div class="feat-icon">📅</div>
+        <div class="feat-title">Contas a P/R</div>
+        <div class="feat-desc">Agenda de vencimentos futuros com projeção de caixa para 60 dias. Badge de alerta para contas vencidas.</div>
+      </div>
+      <div class="feat-card reveal">
+        <div class="feat-icon">🔍</div>
+        <div class="feat-title">Conciliação Bancária</div>
+        <div class="feat-desc">Compare o saldo calculado com o extrato real. Marque lançamentos como conciliados e identifique o que está faltando.</div>
+      </div>
+      <div class="feat-card reveal">
+        <div class="feat-icon">🏢</div>
+        <div class="feat-title">Multi-Empresas</div>
+        <div class="feat-desc">Carteira de clientes com ambientes isolados. Troque de empresa com um clique. Ideal para consultores com múltiplos clientes.</div>
+      </div>
+      <div class="feat-card reveal">
+        <div class="feat-icon">🌾</div>
+        <div class="feat-title">Multi-Segmentos</div>
+        <div class="feat-desc">Plano de contas específico para 8 segmentos: Comércio, Indústria, Serviços, Transporte, Agronegócio, Construção, Saúde e Misto.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MODELO DE CONSULTORIA -->
+<section class="consultor" id="consultor">
+  <div class="consultor-inner">
+    <div class="reveal">
+      <span class="sec-tag" style="display:block;margin-bottom:20px">Para Gestores Financeiros</span>
+      <div class="consultor-quote">
+        O Visore não é só um software — é a sua ferramenta de trabalho na reunião com o cliente. Você leva os números, a análise e a recomendação. O cliente enxerga o valor da consultoria.
+      </div>
+    </div>
+    <div class="consultor-steps reveal">
+      <div class="step-card">
+        <span class="step-num">01</span>
+        <div class="step-title">Cadastre a empresa</div>
+        <div class="step-desc">Segmento, regime tributário e dados básicos. Em 2 minutos o ambiente está pronto.</div>
+      </div>
+      <div class="step-card">
+        <span class="step-num">02</span>
+        <div class="step-title">Importe o extrato</div>
+        <div class="step-desc">PDF, Excel ou CSV do banco. A IA lê, categoriza e monta o fluxo de caixa automaticamente.</div>
+      </div>
+      <div class="step-card">
+        <span class="step-num">03</span>
+        <div class="step-title">Analise os números</div>
+        <div class="step-desc">DRE, EBITDA, indicadores e alertas gerados em tempo real. Veja o que está bem e o que precisa de atenção.</div>
+      </div>
+      <div class="step-card">
+        <span class="step-num">04</span>
+        <div class="step-title">Apresente ao cliente</div>
+        <div class="step-desc">Gere o Relatório Executivo com análise de IA. Uma página, linguagem clara, recomendação concreta.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="cta-final">
+  <h2>Comece a <em>enxergar</em><br>seus números agora</h2>
+  <p>Sem cadastro. Sem cartão de crédito. Abra e use imediatamente.</p>
+  <a href="./index.html" target="_blank" class="btn-primary" style="font-size:16px;padding:17px 44px;margin:0 auto;display:inline-flex">
+    ▶ &nbsp;Abrir o Visore
+  </a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Vi<em>sore</em></div>
+  <p>Gestão Financeira Inteligente para Empresas Brasileiras</p>
+  <p style="color:rgba(255,255,255,.2)">© 2026 Visore · Todos os direitos reservados</p>
+</footer>
+
+<script>
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if(e.isIntersecting){
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
